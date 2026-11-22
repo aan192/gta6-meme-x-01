@@ -17,4 +17,16 @@ if (!fs.existsSync(outputDir)) {
 }
 
 fs.copyFileSync(srcFile, destFile);
-console.log(`Copied ${srcFile} to ${destFile}`);
+
+try {
+  const copiedContent = fs.readFileSync(destFile, "utf8");
+  const parsed = JSON.parse(copiedContent);
+  if (!parsed.url || typeof parsed.url !== "string" || !parsed.url.startsWith("https://x.com/")) {
+    console.error(`Error: Invalid or missing URL in POST.json: ${parsed.url}`);
+    process.exit(1);
+  }
+  console.log(`Verified valid X post URL: ${parsed.url}`);
+} catch (err: any) {
+  console.error(`Error: Failed to read or parse copied POST.json: ${err.message}`);
+  process.exit(1);
+}
