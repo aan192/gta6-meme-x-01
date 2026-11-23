@@ -30,3 +30,17 @@ try {
   console.error(`Error: Failed to read or parse copied POST.json: ${err.message}`);
   process.exit(1);
 }
+
+// Carry the meme image itself into the output alongside POST.json, so the
+// entry ships the exact picture the post names. The current meme is a JPEG;
+// fall back to the older PNG name if that is all the bot dir holds. A missing
+// image is worth a warning, not a failure: POST.json is the entry's core.
+const memeCandidates = ["meme.jpg", "meme.png"];
+const memeName = memeCandidates.find((name) => fs.existsSync(path.join(botDir, name)));
+
+if (memeName) {
+  fs.copyFileSync(path.join(botDir, memeName), path.join(outputDir, memeName));
+  console.log(`Copied meme image: ${memeName}`);
+} else {
+  console.log("Warning: no meme image (meme.jpg or meme.png) found in the bot dir; continuing without one.");
+}
